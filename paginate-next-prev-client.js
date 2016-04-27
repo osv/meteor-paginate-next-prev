@@ -86,7 +86,7 @@ _.extend(PaginatePrevNext.prototype, {
     };
 
     Meteor.call(this._methodNameSet, opt, function(err, res) {
-      self.rCurrentPage.set(res || {});
+      self.rCurrentPage.set(res || {data: []});
       callback(err, res);
     });
   },

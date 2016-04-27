@@ -130,6 +130,10 @@ Meteor.autorun(function() {
         });
         res = res || {};
         test.equal(res.data, expect, 'Query page with empty art, use defaut, and expect _id and sortItem only fields');
+        test.equal(res.current, {
+          sortValue: 12,
+          prevNext: false
+        }, 'Current page');
         test.equal(res.previous, {
           sortValue: 12,
           prevNext: true

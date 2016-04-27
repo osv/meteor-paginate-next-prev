@@ -104,6 +104,7 @@ _.extend(PaginatePrevNext.prototype, {
       }
 
       return {
+        current: {prevNext: opt.prevNext, sortValue: opt.sortValue},
         data: data,
         previous: prevPage,
         next: nextPage,
