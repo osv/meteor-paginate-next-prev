@@ -94,4 +94,18 @@ _.extend(PaginatePrevNext.prototype, {
   getPageItems: function() {
     return this.rCurrentPage.get();
   },
+
+  initSubscribtions: function() {
+    var self = this;
+    Meteor.autorun(function(c) {
+      var page = self.getPageItems() || {},
+          pageItems = _.pluck(page.data, '_id'),
+          sorterName = page.sorterName;
+
+      if (!_.isEmpty(pageItems) && _.isString(sorterName)) {
+        self.subscribeCurrent =
+          Meteor.subscribe(self._subscribeNameCurrent, pageItems, sorterName);
+      }
+    });
+  },
 });

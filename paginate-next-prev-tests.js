@@ -366,3 +366,54 @@ Meteor.startup(function() {
     });
   }
 });
+
+// subscribtion test
+Meteor.startup(function() {
+  var paginator = new PaginatePrevNext({
+    collection: collection,
+    name: 'test-sub',
+    subscribe: true,
+    sortsBy: [
+      {
+        name: 'by sort item',
+        init: function() { return 12; },
+        field: 'sortItem',
+      }
+    ]
+  });
+
+  if (Meteor.isClient) {
+    Tinytest.addAsync('Subscribe - basic', function (test, cb) {
+      Meteor.autorun(function(a) {
+        var page = paginator.getPageItems();
+
+        if (paginator.subscribeCurrent &&
+            paginator.subscribeCurrent.ready()) {
+
+          Meteor.defer(function() {
+            var itemsCount = collection.find().count();
+            test.equal(itemsCount, 10, 'subscribed for 10 items');
+
+            var firstCachedItem = page.data[0];
+            test.equal(firstCachedItem, {
+              _id: '12',
+              sortItem: 12
+            }, 'If subscribe then cached items should ' +
+                       'have only id and sort\'s field');
+
+            var item12 = collection.findOne('12');
+            test.equal(item12, {
+              _id: '12',
+              sortItem: 12,
+              text: 'text ' + 12
+            }, 'Subscribed item should have all properties');
+
+            cb();
+            a.stop();
+          });
+        }
+      });
+      paginator.setPage(function() {});
+    });
+  }
+});

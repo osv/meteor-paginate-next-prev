@@ -74,8 +74,15 @@ _.extend(PaginatePrevNext.prototype, {
       };
 
       var fields = settings.fields;
-      if (_.isFunction(fields)) {
-        fields = fields(stashForCallbacks);
+      // if subscribe - no need all fields, _id is enough
+      if (settings.subscribe) {
+        fields = {
+          _id: 1
+        };
+      } else {
+        if (_.isFunction(fields)) {
+          fields = fields(stashForCallbacks);
+        }
       }
       // Ensure that sorter field is exposed
       if (fields) {
@@ -104,6 +111,7 @@ _.extend(PaginatePrevNext.prototype, {
       }
 
       return {
+        sorterName: opt.sorterName,
         current: {prevNext: opt.prevNext, sortValue: opt.sortValue},
         data: data,
         previous: prevPage,
@@ -116,5 +124,57 @@ _.extend(PaginatePrevNext.prototype, {
     self._methods = true;
 
     return self;
-  }
+  },
+
+  initPublish: function() {
+    var self = this;
+    Meteor.publish(self._subscribeNameCurrent, subscribe);
+
+    function subscribe(pageItems, sorterName) {
+      var settings = self._settings;
+      var stashForCallbacks = {
+        userId: this.userId,
+      };
+
+      // ensure that pageitems is id - str, num or ObjectID
+      check(pageItems, [Match.OneOf(String, Meteor.Collection.ObjectID, Number)]);
+      check(sorterName, String);
+
+      var sorter = self.sorterByName(sorterName);
+
+      if (!sorter ||
+          pageItems.length < settings.limitMin ||
+          pageItems.length > settings.limitMax) {
+        return [];
+      }
+
+      if (_.isFunction(settings.onAuth)) {
+        var res = settings.onAuth(stashForCallbacks);
+        if (!res) {
+          return [];
+        }
+      }
+
+      // XXX: Does it realy need sort and limit for turnon oplog with $in query?
+      var queryOpt = {
+        sort: {},
+        limit: pageItems.length
+      };
+
+      var direction = sorter.abc;
+      queryOpt.sort[sorter.field] = direction ? 1 : -1;
+
+      var fields = settings.fields;
+      if (_.isFunction(fields)) {
+        fields = fields(stashForCallbacks);
+      }
+      // Ensure that sorter field is exposed
+      if (fields) {
+        queryOpt.fields = fields;
+        queryOpt.fields[sorter.field] = 1;
+      }
+
+      return settings.collection.find({_id: {$in: pageItems}}, queryOpt);
+    }
+  },
 });

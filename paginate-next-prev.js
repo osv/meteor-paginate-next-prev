@@ -5,7 +5,7 @@
 var CHECK_OPTIONS = {
   name:          String,
   collection:    Meteor.Collection,
-  subscirbeName: Match.Optional(String),
+  subscribe:     Match.Optional(Boolean),
   limitMin:      Match.Optional(Number),
   limit:         Match.Optional(Number), // default limit
   limitMax:      Match.Optional(Number),
@@ -38,13 +38,20 @@ PaginatePrevNext = function(options) {
   var name = this._settings.name;
 
   this._methodNameSet = 'pg-set-' + name;
+  this._subscribeNameCurrent = 'pg-sub-' + name + '-current';
 
   if (Meteor.isClient) {
     this.initDefault();
+    if (options.subscribe) {
+      this.initSubscribtions();
+    }
   }
 
   if (Meteor.isServer) {
     this._initMethods()
+    if (options.subscribe) {
+      this.initPublish();
+    }
   }
 
 };
