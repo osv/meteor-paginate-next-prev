@@ -123,7 +123,7 @@ Meteor.autorun(function() {
   if (Meteor.isClient) {
     Tinytest.addAsync('Query page - empty args, CBA', function (test, cb) {
 
-      paginator._setPageRes = function(err, res) {
+      var testCallback = function(err, res) {
         // from 12 CBA -> 12..3
         var expect = _.map(_.range(3, 13).reverse(), function(i) {
           return {_id: '' + i, sortItem: i};
@@ -141,12 +141,12 @@ Meteor.autorun(function() {
         cb();
       };
 
-      paginator.setPage();
+      paginator.setPage(testCallback);
     });
 
     Tinytest.addAsync('Query page - empty args, ABC', function (test, cb) {
       paginator.setSorter('by sort item reverse');
-      paginator._setPageRes = function(err, res) {
+      var testCallback = function(err, res) {
         // from 12 ABC 12..22
         var expect = _.map(_.range(12, 22), function(i) {
           return {_id: '' + i, sortItem: i};
@@ -164,13 +164,13 @@ Meteor.autorun(function() {
         cb();
       };
 
-      paginator.setPage();
+      paginator.setPage(testCallback);
     });
 
     ////
     Tinytest.addAsync('Query page CBA - next page', function (test, cb) {
       paginator.setSorter('by sort item');
-      paginator._setPageRes = function(err, res) {
+      var testCallback = function(err, res) {
         // next from 3 CBA 2..0
         var expect = _.map(_.range(0, 3).reverse(), function(i) {
           return {_id: '' + i, sortItem: i};
@@ -185,12 +185,12 @@ Meteor.autorun(function() {
         cb();
       };
 
-      paginator.setPage(false /* next */, 3, true /* isNextPage*/);
+      paginator.setPage(false /* next */, 3, true /* isNextPage*/, testCallback);
     });
 
     Tinytest.addAsync('Query page CBA - previous page', function (test, cb) {
       paginator.setSorter('by sort item');
-      paginator._setPageRes = function(err, res) {
+      var testCallback = function(err, res) {
         // prev from 12 bca -> 22..13
         var expect = _.map(_.range(13, 23).reverse(), function(i) {
           return {_id: '' + i, sortItem: i};
@@ -208,12 +208,12 @@ Meteor.autorun(function() {
         cb();
       };
 
-      paginator.setPage(true /* prev */, 12, true /* isNextPage*/);
+      paginator.setPage(true /* prev */, 12, true /* isNextPage*/, testCallback);
     });
 
     Tinytest.addAsync('Query page ABC - next page', function (test, cb) {
       paginator.setSorter('by sort item reverse');
-      paginator._setPageRes = function(err, res) {
+      var testCallback = function(err, res) {
         // next from abc 21 ->  22..31
         var expect = _.map(_.range(22, 32), function(i) {
           return {_id: '' + i, sortItem: i};
@@ -231,12 +231,12 @@ Meteor.autorun(function() {
         cb();
       };
 
-      paginator.setPage(false /* next */, 21, true /* isNextPage*/);
+      paginator.setPage(false /* next */, 21, true /* isNextPage*/, testCallback);
     });
 
     Tinytest.addAsync('Query page ABC - previous page', function (test, cb) {
       paginator.setSorter('by sort item reverse');
-      paginator._setPageRes = function(err, res) {
+      var testCallback = function(err, res) {
         // prev from abc 21 ->  11..20
         var expect = _.map(_.range(11, 21), function(i) {
           return {_id: '' + i, sortItem: i};
@@ -254,12 +254,12 @@ Meteor.autorun(function() {
         cb();
       };
 
-      paginator.setPage(true /* previous */, 21, true /* isNextPage*/);
+      paginator.setPage(true /* previous */, 21, true /* isNextPage*/, testCallback);
     });
 
     Tinytest.addAsync('Queried page not full - previous page', function (test, cb) {
       paginator.setSorter('by sort item');
-      paginator._setPageRes = function(err, res) {
+      var testCallback = function(err, res) {
         // prev from BCA 95 -> 99..96
         var expect = _.map(_.range(96, 100).reverse(), function(i) {
           return {_id: '' + i, sortItem: i};
@@ -274,12 +274,12 @@ Meteor.autorun(function() {
         cb();
       };
 
-      paginator.setPage(true /* previous */, 95, true /* isNextPage*/);
+      paginator.setPage(true /* previous */, 95, true /* isNextPage*/, testCallback);
     });
 
     Tinytest.addAsync('Queried page not full - next page', function (test, cb) {
       paginator.setSorter('by sort item');
-      paginator._setPageRes = function(err, res) {
+      var testCallback = function(err, res) {
         // next from BCA 4 -> 3..0
         var expect = _.map(_.range(0, 4).reverse(), function(i) {
           return {_id: '' + i, sortItem: i};
@@ -294,7 +294,7 @@ Meteor.autorun(function() {
         cb();
       };
 
-      paginator.setPage(false /* next */, 4, true /* isNextPage*/);
+      paginator.setPage(false /* next */, 4, true /* isNextPage*/, testCallback);
     });
   }
 });
@@ -333,26 +333,17 @@ Meteor.autorun(function() {
 
   if (Meteor.isClient) {
     Tinytest.addAsync('Callbacks test', function (test, cb) {
-      paginator._setPageRes = function(err, res) {
+      var testCallback = function(err, res) {
         // from 12 CBA -> 12..3
         var expect = _.map(_.range(3, 13).reverse(), function(i) {
           return {_id: '' + i, sortItem: i};
         });
         res = res || {};
-        test.equal(res.data, expect, 'Query page with empty art, use defaut, and expect _id and sortItem only fields');
-        test.equal(res.previous, {
-          sortValue: 12,
-          prevNext: true
-        }, 'Query page with empty art, previous pages');
-        test.equal(res.next, {
-          sortValue: 3,
-          prevNext: false
-        }, 'Query page with empty art, next pages');
+        test.equal(res.data, expect, 'If fields called right expected only _id and sortItem.');;
         cb();
       };
 
-      paginator.setPage();
+      paginator.setPage(testCallback);
     });
   }
-
-})
+});

@@ -1,4 +1,4 @@
-/*global PaginatePrevNext, _ */
+/*global PaginatePrevNext, Meteor, console, _ */
 
 _.extend(PaginatePrevNext.prototype, {
   initDefault: function() {
@@ -55,9 +55,14 @@ _.extend(PaginatePrevNext.prototype, {
     return this.rFilter.get() || {};
   },
 
-  setPage: function(prevNext, sortValue, isNextPrevPage) {
-    var self = this,
-        sorterName = this.getSorter();
+  setPage: function(prevNext, sortValue, isNextPrevPage, callback) {
+    var sorterName = this.getSorter();
+
+    // allow first arg to be callback
+    if (arguments.length === 1 && _.isFunction(prevNext)) {
+      callback = prevNext;
+      prevNext = sortValue = isNextPrevPage = undefined;
+    }
 
     var opt = {
       prevNext: prevNext || false,
@@ -68,20 +73,10 @@ _.extend(PaginatePrevNext.prototype, {
       limit: this.getLimit(),
     };
 
-    console.log('call', this._methodNameSet);
+    callback = callback || function() {
+      console.warn('pagination: You forgot calback!');
+    };
 
-    Meteor.call(this._methodNameSet, opt, function(err, res) {
-      self._setPageRes(err, res);
-
-      if (err) {
-        console.warn(err);
-      } else {
-        console.log('res', res);
-      }
-    });
+    Meteor.call(this._methodNameSet, opt, callback);
   },
-
-  _setPageRes: function(err, res) {
-    // dummy fun, used for testing
-  }
 });
