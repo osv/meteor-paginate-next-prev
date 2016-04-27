@@ -1,4 +1,4 @@
-/*global Tinytest, PaginatePrevNext */
+/*global Tinytest, Meteor, PaginatePrevNext */
 
 var collection = new Meteor.Collection('pgTestCol');
 
@@ -6,7 +6,7 @@ if (Meteor.isServer) {
   if (!collection.findOne()) {
     for(var i = 0; i < 100; i++) {
       collection.insert({
-        _id: ''+i,
+        _id: '' + i,
         sortItem: i,
         text: 'text ' + i,
       });
@@ -99,7 +99,7 @@ Meteor.startup(function() {
   });
 });
 
-Meteor.autorun(function() {
+Meteor.startup(function() {
   var paginator = new PaginatePrevNext({
     collection: collection,
     name: 'test-method-field',
@@ -323,7 +323,7 @@ Meteor.autorun(function() {
  * final callback fields check called callbacks and set field to {_id: 1}
  * So it pass only if result is array of {_id, sortItem}
  */
-Meteor.autorun(function() {
+Meteor.startup(function() {
   var paginator = new PaginatePrevNext({
     collection: collection,
     name: 'test-auth',
@@ -358,7 +358,7 @@ Meteor.autorun(function() {
           return {_id: '' + i, sortItem: i};
         });
         res = res || {};
-        test.equal(res.data, expect, 'If fields called right expected only _id and sortItem.');;
+        test.equal(res.data, expect, 'If fields called right expected only _id and sortItem.');
         cb();
       };
 
