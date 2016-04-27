@@ -6,6 +6,13 @@ _.extend(PaginatePrevNext.prototype, {
         limit = settings.limit,
         sorterName = settings.sortsBy[0].name;
 
+    // Init reactive variables
+    if (!this.rLimit) {
+      this.rLimit = new ReactiveVar();
+      this.rSorter = new ReactiveVar();
+      this.rFilter = new ReactiveVar();
+      this.rCurrentPage = new ReactiveVar();
+    }
     this.setLimit(limit);
     this.setSorter(sorterName);
     return this;

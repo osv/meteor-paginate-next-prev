@@ -1,4 +1,4 @@
-/*global PaginatePrevNext, _, check, Match, Meteor, ReactiveVar */
+/*global PaginatePrevNext, _, check, Match, Meteor */
 
 /* jshint -W020 */
 
@@ -40,9 +40,6 @@ PaginatePrevNext = function(options) {
   this._methodNameSet = 'pg-set-' + name;
 
   if (Meteor.isClient) {
-    this.rLimit = new ReactiveVar();
-    this.rSorter = new ReactiveVar();
-    this.rFilter = new ReactiveVar();
     this.initDefault();
   }
 
