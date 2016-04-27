@@ -1,4 +1,4 @@
-/*global PaginatePrevNext, Meteor, console, _ */
+/*global PaginatePrevNext, Meteor, ReactiveVar, console, _ */
 
 _.extend(PaginatePrevNext.prototype, {
   initDefault: function() {
@@ -63,7 +63,8 @@ _.extend(PaginatePrevNext.prototype, {
   },
 
   setPage: function(prevNext, sortValue, isNextPrevPage, callback) {
-    var sorterName = this.getSorter();
+    var self = this,
+        sorterName = this.getSorter();
 
     // allow first arg to be callback
     if (arguments.length === 1 && _.isFunction(prevNext)) {
@@ -84,6 +85,13 @@ _.extend(PaginatePrevNext.prototype, {
       console.warn('pagination: You forgot calback!');
     };
 
-    Meteor.call(this._methodNameSet, opt, callback);
+    Meteor.call(this._methodNameSet, opt, function(err, res) {
+      self.rCurrentPage.set(res || {});
+      callback(err, res);
+    });
+  },
+
+  getPageItems: function() {
+    return this.rCurrentPage.get();
   },
 });

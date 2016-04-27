@@ -167,6 +167,21 @@ Meteor.autorun(function() {
       paginator.setPage(testCallback);
     });
 
+    Tinytest.addAsync('Query page - getPageItems() method', function (test, cb) {
+      paginator.setSorter('by sort item reverse');
+      var testCallback = function() {
+        // from 12 ABC 12..22
+        var expect = _.map(_.range(12, 22), function(i) {
+          return {_id: '' + i, sortItem: i};
+        });
+        var res = paginator.getPageItems();
+        test.equal(res.data, expect, 'getPageItems()');
+        cb();
+      };
+
+      paginator.setPage(testCallback);
+    });
+
     ////
     Tinytest.addAsync('Query page CBA - next page', function (test, cb) {
       paginator.setSorter('by sort item');
