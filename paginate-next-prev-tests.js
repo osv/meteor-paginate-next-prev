@@ -171,15 +171,15 @@ Meteor.startup(function() {
       paginator.setPage(testCallback);
     });
 
-    Tinytest.addAsync('Query page - getPageItems() method', function (test, cb) {
+    Tinytest.addAsync('Query page - getPageData() method', function (test, cb) {
       paginator.setSorter('by sort item reverse');
       var testCallback = function() {
         // from 12 ABC 12..22
         var expect = _.map(_.range(12, 22), function(i) {
           return {_id: '' + i, sortItem: i};
         });
-        var res = paginator.getPageItems();
-        test.equal(res.data, expect, 'getPageItems()');
+        var res = paginator.getPageData();
+        test.equal(res.data, expect, 'getPageData()');
         cb();
       };
 
@@ -385,7 +385,7 @@ Meteor.startup(function() {
   if (Meteor.isClient) {
     Tinytest.addAsync('Subscribe - basic', function (test, cb) {
       Meteor.autorun(function(a) {
-        var page = paginator.getPageItems();
+        var page = paginator.getPageData();
 
         if (paginator.subscribeCurrent &&
             paginator.subscribeCurrent.ready()) {

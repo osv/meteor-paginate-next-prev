@@ -91,14 +91,14 @@ _.extend(PaginatePrevNext.prototype, {
     });
   },
 
-  getPageItems: function() {
+  getPageData: function() {
     return this.rCurrentPage.get();
   },
 
   initSubscribtions: function() {
     var self = this;
     Meteor.autorun(function(c) {
-      var page = self.getPageItems() || {},
+      var page = self.getPageData() || {},
           pageItems = _.pluck(page.data, '_id'),
           sorterName = page.sorterName;
 
