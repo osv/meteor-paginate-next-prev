@@ -9,7 +9,7 @@ var CHECK_OPTIONS = {
   limitMin:      Match.Optional(Number),
   limit:         Match.Optional(Number), // default limit
   limitMax:      Match.Optional(Number),
-  fields:        Match.Optional(Object),
+  fields:        Match.Optional(Match.OneOf(Object, Function)),
   onAuth:        Match.Optional(Function),
   onQueryCheck:  Match.Optional(Function),
   sortsBy: [{

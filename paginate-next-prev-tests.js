@@ -296,7 +296,63 @@ Meteor.autorun(function() {
 
       paginator.setPage(false /* next */, 4, true /* isNextPage*/);
     });
+  }
+});
 
+/* Complex callback test
+ * use stash for collecting called callbacks
+ * final callback fields check called callbacks and set field to {_id: 1}
+ * So it pass only if result is array of {_id, sortItem}
+ */
+Meteor.autorun(function() {
+  var paginator = new PaginatePrevNext({
+    collection: collection,
+    name: 'test-auth',
+    onAuth: function(stash) {
+      stash.onAuth = 1;
+      return true;
+    },
+    onQueryCheck: function(stash, fields) {
+      stash.onQueryCheck = 2;
+    },
+    fields: function(stash) {
+      if (stash.onQueryCheck === 2 &&
+          stash.onAuth === 1) {
+        return {_id: 1};
+      }
+      return undefined;
+    },
+    sortsBy: [
+      {
+        name: 'by sort item',
+        init: function() { return 12; },
+        field: 'sortItem',
+      }
+    ]
+  });
+
+  if (Meteor.isClient) {
+    Tinytest.addAsync('Callbacks test', function (test, cb) {
+      paginator._setPageRes = function(err, res) {
+        // from 12 CBA -> 12..3
+        var expect = _.map(_.range(3, 13).reverse(), function(i) {
+          return {_id: '' + i, sortItem: i};
+        });
+        res = res || {};
+        test.equal(res.data, expect, 'Query page with empty art, use defaut, and expect _id and sortItem only fields');
+        test.equal(res.previous, {
+          sortValue: 12,
+          prevNext: true
+        }, 'Query page with empty art, previous pages');
+        test.equal(res.next, {
+          sortValue: 3,
+          prevNext: false
+        }, 'Query page with empty art, next pages');
+        cb();
+      };
+
+      paginator.setPage();
+    });
   }
 
 })

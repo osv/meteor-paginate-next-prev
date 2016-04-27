@@ -10,12 +10,6 @@ _.extend(PaginatePrevNext.prototype, {
     var methods = {};
     methods[self._methodNameSet] = function(opt) {
 
-      if (self.onAuth) {
-        var res = self.onAuth.call(this, self);
-        if (!res) {
-          self.error(401);
-        }
-      }
       check(opt, {
         prevNext: Boolean,
         sortValue: Match.Optional(Match.OneOf(String, Number, Date)),
@@ -26,17 +20,33 @@ _.extend(PaginatePrevNext.prototype, {
       });
 
       var sorter = self.sorterByName(opt.sorterName);
-      var settings = self._settings;
+
       if (!sorter) {
         this.error(403);
+      }
+
+      var settings = self._settings;
+
+      // this will be passed to some callbacks
+      var stashForCallbacks = {
+        userId: this.userId,
+        sorter: sorter,
+      };
+
+      if (_.isFunction(settings.onAuth)) {
+        var res = settings.onAuth(stashForCallbacks);
+        if (!res) {
+          self.error(401);
+        }
       }
 
       if (_.isUndefined(opt.sortValue)) {
         opt.sortValue = sorter.init();
       }
 
-      if (self.onQueryCheck) {
-        opt.filter = self.onQueryCheck(this, opt.filter, self);
+      if (_.isFunction(settings.onQueryCheck)) {
+        opt.filter = settings.onQueryCheck(stashForCallbacks, opt.filter) || {};
+        check(opt.filter, Object);
       }
 
       var lmin = settings.limitMin,
@@ -63,13 +73,18 @@ _.extend(PaginatePrevNext.prototype, {
         limit: opt.limit
       };
 
-      if (settings.fields) {
-        queryOpt.fields = settings.fields;
+      var fields = settings.fields;
+      if (_.isFunction(fields)) {
+        fields = fields(stashForCallbacks);
+      }
+      // Ensure that sorter field is exposed
+      if (fields) {
+        queryOpt.fields = fields;
         queryOpt.fields[sorter.field] = 1;
       }
 
       queryOpt.sort[sorter.field] = direction ? 1 : -1;
-      console.log('find', query, queryOpt);
+      // console.log('find', query, queryOpt);
 
       var data =  settings.collection.find(query, queryOpt).fetch();
       if (opt.prevNext) {
