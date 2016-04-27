@@ -75,10 +75,19 @@ _.extend(PaginatePrevNext.prototype, {
       if (opt.prevNext) {
         data = data.reverse();
       }
-      var nextPageData = data[opt.limit - 1],
+      var nextPageData = data[data.length - 1],
           nextPage = nextPageData ? {prevNext: false, sortValue: nextPageData[sorter.field]} : undefined;
       var prevPageData = data[0],
           prevPage = prevPageData ? {prevNext: true, sortValue: prevPageData[sorter.field]} : undefined;
+
+      if (opt.prevNext && data.length !== opt.limit) {
+        prevPage = undefined;
+      }
+
+      if (!opt.prevNext && data.length !== opt.limit) {
+        nextPage = undefined;
+      }
+
       return {
         data: data,
         previous: prevPage,

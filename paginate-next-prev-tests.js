@@ -257,6 +257,46 @@ Meteor.autorun(function() {
       paginator.setPage(true /* previous */, 21, true /* isNextPage*/);
     });
 
+    Tinytest.addAsync('Queried page not full - previous page', function (test, cb) {
+      paginator.setSorter('by sort item');
+      paginator._setPageRes = function(err, res) {
+        // prev from BCA 95 -> 99..96
+        var expect = _.map(_.range(96, 100).reverse(), function(i) {
+          return {_id: '' + i, sortItem: i};
+        });
+        res = res || {};
+        test.equal(res.data, expect, 'Query previous page - data');
+        test.equal(res.previous, undefined, 'Previous page');
+        test.equal(res.next, {
+          sortValue: 96,
+          prevNext: false
+        }, 'Next pages');
+        cb();
+      };
+
+      paginator.setPage(true /* previous */, 95, true /* isNextPage*/);
+    });
+
+    Tinytest.addAsync('Queried page not full - next page', function (test, cb) {
+      paginator.setSorter('by sort item');
+      paginator._setPageRes = function(err, res) {
+        // next from BCA 4 -> 3..0
+        var expect = _.map(_.range(0, 4).reverse(), function(i) {
+          return {_id: '' + i, sortItem: i};
+        });
+        res = res || {};
+        test.equal(res.data, expect, 'Query next page - data');
+        test.equal(res.previous, {
+          sortValue: 3,
+          prevNext: true
+        }, 'Previous page');
+        test.equal(res.next, undefined, 'Next pages');
+        cb();
+      };
+
+      paginator.setPage(false /* next */, 4, true /* isNextPage*/);
+    });
+
   }
 
 })
