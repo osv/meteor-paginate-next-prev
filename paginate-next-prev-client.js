@@ -12,6 +12,7 @@ _.extend(PaginatePrevNext.prototype, {
       this.rSorter = new ReactiveVar();
       this.rFilter = new ReactiveVar();
       this.rCurrentPage = new ReactiveVar();
+      this.rIsLoading = new ReactiveVar();
     }
     this.setLimit(limit);
     this.setSorter(sorterName);
@@ -85,20 +86,22 @@ _.extend(PaginatePrevNext.prototype, {
       console.warn('pagination: You forgot calback!');
     };
 
+    self.rIsLoading.set(true);
     Meteor.call(this._methodNameSet, opt, function(err, res) {
+      self.rIsLoading.set(false);
       self.rCurrentPage.set(res || {data: []});
       callback(err, res);
     });
   },
 
   getPageData: function() {
-    return this.rCurrentPage.get();
+    return this.rCurrentPage.get() || {};
   },
 
   initSubscribtions: function() {
     var self = this;
     Meteor.autorun(function(c) {
-      var page = self.getPageData() || {},
+      var page = self.getPageData(),
           pageItems = _.pluck(page.data, '_id'),
           sorterName = page.sorterName;
 
