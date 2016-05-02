@@ -93,7 +93,7 @@ _.extend(PaginatePrevNext.prototype, {
       }
 
       queryOpt.sort[sorter.field] = direction ? 1 : -1;
-      // console.log('find', query, queryOpt);
+      self.debug('using sorter "' + opt.sorterName + '" find(\n', query, ',\n', queryOpt, ')');
 
       var data =  settings.collection.find(query, queryOpt).fetch();
       if (opt.prevNext) {

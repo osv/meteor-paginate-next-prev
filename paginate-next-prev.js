@@ -1,4 +1,4 @@
-/*global PaginatePrevNext, _, check, Match, Meteor */
+/*global PaginatePrevNext, _, check, Match, Meteor, console */
 
 /* jshint -W020 */
 
@@ -69,4 +69,12 @@ _.extend(PaginatePrevNext.prototype, {
     msg = msg || code;
     throw new Meteor.Error(code, 'PaginatePrevNext: ' + msg);
   },
+
+  debug: function() {
+    if (PaginatePrevNext.debug) {
+      var prefix = ['PG "' + this._settings.name + '"'],
+          args = [].slice.call(arguments, 0);
+      console.log.apply(console, prefix.concat(args));
+    }
+  }
 });
