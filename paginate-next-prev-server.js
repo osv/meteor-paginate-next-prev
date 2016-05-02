@@ -40,7 +40,7 @@ _.extend(PaginatePrevNext.prototype, {
         }
       }
 
-      if (_.isUndefined(opt.sortValue)) {
+      if (_.isUndefined(opt.sortValue) && sorter.init) {
         opt.sortValue = sorter.init();
       }
 
@@ -64,8 +64,10 @@ _.extend(PaginatePrevNext.prototype, {
       // direction of next page, if sort is ABC - invert
       var direction = sorter.abc ^ opt.prevNext;
 
-      queryForSort[sorter.field] = {};
-      queryForSort[sorter.field][direction ? $gt : $lt] = opt.sortValue;
+      if (!_.isUndefined(opt.sortValue)) {
+        queryForSort[sorter.field] = {};
+        queryForSort[sorter.field][direction ? $gt : $lt] = opt.sortValue;
+      }
 
       var query = _.extend(opt.filter, queryForSort);
       var queryOpt = {

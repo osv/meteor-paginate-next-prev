@@ -116,6 +116,9 @@ Meteor.startup(function() {
         init: function() { return 12; },
         field: 'sortItem',
         abc: true,
+      }, {
+        name: 'sort without init',
+        field: 'sortItem'
       }
     ]
   });
@@ -228,6 +231,21 @@ Meteor.startup(function() {
       };
 
       paginator.setPage(true /* prev */, 12, true /* isNextPage*/, testCallback);
+    });
+
+    Tinytest.addAsync('Query page CBA - sorter without init()', function (test, cb) {
+      paginator.setSorter('sort without init');
+      var testCallback = function() {
+        // from 12 CBA 99..90
+        var expect = _.map(_.range(90, 100).reverse(), function(i) {
+          return {_id: '' + i, sortItem: i};
+        });
+        var res = paginator.getPageData();
+        test.equal(res.data, expect, 'getPageData()');
+        cb();
+      };
+
+      paginator.setPage(testCallback);
     });
 
     Tinytest.addAsync('Query page ABC - next page', function (test, cb) {

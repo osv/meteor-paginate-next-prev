@@ -14,7 +14,7 @@ var CHECK_OPTIONS = {
   onQueryCheck:  Match.Optional(Function),
   sortsBy: [{
     name:   String,
-    init:   Function,
+    init:   Match.Optional(Function),
     field:  String,
     abc:    Match.Optional(Boolean)
   }]
