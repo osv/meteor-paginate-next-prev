@@ -391,7 +391,7 @@ Meteor.startup(function() {
     collection: collection,
     name: 'test-sub',
     subscribe: true,
-    subscribePrecache: ['next'],
+    subscribePrecache: false,
     sortsBy: [
       {
         name: 'by sort item',
