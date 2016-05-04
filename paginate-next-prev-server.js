@@ -128,16 +128,29 @@ _.extend(PaginatePrevNext.prototype, {
     return self;
   },
 
-  initPublish: function() {
+  _initPublish: function() {
     var self = this;
-    Meteor.publish(self._subscribeNameCurrent, subscribe);
 
-    function subscribe(pageItems, sorterName) {
+    if (self._published) {
+      return self;
+    }
+
+    self.subPages.forEach(function(i) {
+      Meteor.publish(self._subscribeNamePrefix + i, publish);
+    });
+
+    self._published = true;
+    return self;
+
+    function publish(pageItems, sorterName) {
       var settings = self._settings;
       var stashForCallbacks = {
         userId: this.userId,
       };
 
+      if (_.isEmpty(pageItems)) {
+        return [];
+      }
       // ensure that pageitems is id - str, num or ObjectID
       check(pageItems, [Match.OneOf(String, Meteor.Collection.ObjectID, Number)]);
       check(sorterName, String);

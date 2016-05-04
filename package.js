@@ -14,7 +14,7 @@ Package.onUse(function(api) {
   api.versionsFrom('1.2.0.2');
   api.use('underscore');
   api.use('check');
-  api.use('reactive-var');
+  api.use('reactive-dict');
   api.addFiles('paginate-next-prev.js');
   api.addFiles('paginate-next-prev-server.js', 'server');
   api.addFiles('paginate-next-prev-client.js', 'client');

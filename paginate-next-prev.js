@@ -2,10 +2,17 @@
 
 /* jshint -W020 */
 
+// Names for prev, current, next pages that used in dictionary, etc
+var I_PREV = 'prev',
+    I_NEXT = 'next',
+    I_CURRENT = 'current';
+
 var CHECK_OPTIONS = {
   name:          String,
   collection:    Meteor.Collection,
   subscribe:     Match.Optional(Boolean),
+  subscribePrecache: Match.Optional(
+    Match.OneOf(Boolean, [Match.OneOf(I_PREV, I_CURRENT, I_NEXT)])),
   limitMin:      Match.Optional(Number),
   limit:         Match.Optional(Number), // default limit
   limitMax:      Match.Optional(Number),
@@ -20,7 +27,6 @@ var CHECK_OPTIONS = {
   }]
 };
 
-var methodsCount = 0;
 PaginatePrevNext = function(options) {
   if (! (this instanceof PaginatePrevNext)) {
     throw new Meteor.Error('missing-new', 'PaginatePrevNext instance has to be initiated with `new`');
@@ -32,13 +38,22 @@ PaginatePrevNext = function(options) {
     limitMin: 1,
     limitMax: 10,
     limit: 10,
+    subscribePrecache: true,
   }, options);
 
-  methodsCount = methodsCount + 1;
+  // decide what allow to sub/pub
+  var precacheOpt = this._settings.subscribePrecache;
+  if (_.isBoolean(precacheOpt)) {
+    this.subPages = precacheOpt ? [I_CURRENT, I_PREV, I_NEXT] : [I_CURRENT];
+  } else {
+    this.subPages = _.uniq([I_CURRENT].concat(precacheOpt));
+  }
+
   var name = this._settings.name;
 
+
   this._methodNameSet = 'pg-set-' + name;
-  this._subscribeNameCurrent = 'pg-sub-' + name + '-current';
+  this._subscribeNamePrefix = 'pg-sub-' + name + '_';
 
   if (Meteor.isClient) {
     this.initDefault();
@@ -48,13 +63,17 @@ PaginatePrevNext = function(options) {
   }
 
   if (Meteor.isServer) {
-    this._initMethods()
+    this._initMethods();
     if (options.subscribe) {
-      this.initPublish();
+      this._initPublish();
     }
   }
 
 };
+
+// Page names
+// Don't change order, see -client.js code
+PaginatePrevNext.PAGE_NAMES = [I_PREV, I_CURRENT, I_NEXT];
 
 var KV_RE = /(.*?)=(.*)/,
     // smplified regexp

@@ -391,6 +391,7 @@ Meteor.startup(function() {
     collection: collection,
     name: 'test-sub',
     subscribe: true,
+    subscribePrecache: ['next'],
     sortsBy: [
       {
         name: 'by sort item',
@@ -404,10 +405,8 @@ Meteor.startup(function() {
     Tinytest.addAsync('Subscribe - basic', function (test, cb) {
       Meteor.autorun(function(a) {
         var page = paginator.getPageData();
-
-        if (paginator.subscribeCurrent &&
-            paginator.subscribeCurrent.ready()) {
-
+        if (paginator.subscribes.current.ready() &&
+            collection.find().count() > 0) {
           Meteor.defer(function() {
             var itemsCount = collection.find().count();
             test.equal(itemsCount, 10, 'subscribed for 10 items');
