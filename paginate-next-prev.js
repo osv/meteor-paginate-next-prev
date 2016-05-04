@@ -51,7 +51,6 @@ PaginatePrevNext = function(options) {
 
   var name = this._settings.name;
 
-
   this._methodNameSet = 'pg-set-' + name;
   this._subscribeNamePrefix = 'pg-sub-' + name + '_';
 
@@ -74,10 +73,6 @@ PaginatePrevNext = function(options) {
 // Page names
 // Don't change order, see -client.js code
 PaginatePrevNext.PAGE_NAMES = [I_PREV, I_CURRENT, I_NEXT];
-
-var KV_RE = /(.*?)=(.*)/,
-    // smplified regexp
-    ISO_DATE_TEST_RE = /\d+-\d+-\d+T\d+:\d+:\d+/;
 
 _.extend(PaginatePrevNext.prototype, {
   sorterByName: function(sorterName) {
