@@ -81,9 +81,11 @@ Meteor.startup(function() {
         }]});
 
     test.equal(p.getSorter(), 'sorter1', 'Default');
+    p.rDict.set('page', {abc: 123});
     var resOfSetter = p.setSorter('sorter2');
     test.equal(resOfSetter, p, 'Setter should return this');
     test.equal(p.getSorter(), 'sorter2', 'Set limit to 3');
+    test.equal(p.rDict.get('page'), {}, 'Setter should reset page data');
     test.throws(function() { p.setSorter('xyz'); }, /Sorter not found/);
   });
 
@@ -92,9 +94,11 @@ Meteor.startup(function() {
 
     test.equal(p.getFilter(), {}, 'Default');
     var filter = {foo: {$ne: 'abc'}};
+    p.rDict.set('page', {abc: 123});
     var resOfSetter = p.setFilter(filter);
     test.equal(resOfSetter, p, 'Setter should return this');
     test.equal(p.getFilter(), filter, 'Get previous set filter');
+    test.equal(p.rDict.get('page'), {}, 'Setter should reset page data');
     test.throws(function() { p.setFilter(1); }, /Filter should be object/);
   });
 });
@@ -148,7 +152,7 @@ Meteor.startup(function() {
         cb();
       };
 
-      paginator.setPage(testCallback);
+      paginator._setCurrentPage(testCallback);
     });
 
     Tinytest.addAsync('Query page - empty args, ABC', function (test, cb) {
@@ -171,7 +175,7 @@ Meteor.startup(function() {
         cb();
       };
 
-      paginator.setPage(testCallback);
+      paginator._setCurrentPage(testCallback);
     });
 
     Tinytest.addAsync('Query page - getPageData() method', function (test, cb) {
@@ -186,7 +190,7 @@ Meteor.startup(function() {
         cb();
       };
 
-      paginator.setPage(testCallback);
+      paginator._setCurrentPage(testCallback);
     });
 
     ////
@@ -207,7 +211,7 @@ Meteor.startup(function() {
         cb();
       };
 
-      paginator.setPage(false /* next */, 3, true /* isNextPage*/, testCallback);
+      paginator._setCurrentPage(false /* next */, 3, true /* isNextPage*/, testCallback);
     });
 
     Tinytest.addAsync('Query page CBA - previous page', function (test, cb) {
@@ -230,7 +234,7 @@ Meteor.startup(function() {
         cb();
       };
 
-      paginator.setPage(true /* prev */, 12, true /* isNextPage*/, testCallback);
+      paginator._setCurrentPage(true /* prev */, 12, true /* isNextPage*/, testCallback);
     });
 
     Tinytest.addAsync('Query page CBA - sorter without init()', function (test, cb) {
@@ -245,7 +249,7 @@ Meteor.startup(function() {
         cb();
       };
 
-      paginator.setPage(testCallback);
+      paginator._setCurrentPage(testCallback);
     });
 
     Tinytest.addAsync('Query page ABC - next page', function (test, cb) {
@@ -268,7 +272,7 @@ Meteor.startup(function() {
         cb();
       };
 
-      paginator.setPage(false /* next */, 21, true /* isNextPage*/, testCallback);
+      paginator._setCurrentPage(false /* next */, 21, true /* isNextPage*/, testCallback);
     });
 
     Tinytest.addAsync('Query page ABC - previous page', function (test, cb) {
@@ -291,7 +295,7 @@ Meteor.startup(function() {
         cb();
       };
 
-      paginator.setPage(true /* previous */, 21, true /* isNextPage*/, testCallback);
+      paginator._setCurrentPage(true /* previous */, 21, true /* isNextPage*/, testCallback);
     });
 
     Tinytest.addAsync('Queried page not full - previous page', function (test, cb) {
@@ -311,7 +315,7 @@ Meteor.startup(function() {
         cb();
       };
 
-      paginator.setPage(true /* previous */, 95, true /* isNextPage*/, testCallback);
+      paginator._setCurrentPage(true /* previous */, 95, true /* isNextPage*/, testCallback);
     });
 
     Tinytest.addAsync('Queried page not full - next page', function (test, cb) {
@@ -331,7 +335,7 @@ Meteor.startup(function() {
         cb();
       };
 
-      paginator.setPage(false /* next */, 4, true /* isNextPage*/, testCallback);
+      paginator._setCurrentPage(false /* next */, 4, true /* isNextPage*/, testCallback);
     });
   }
 });
@@ -380,7 +384,7 @@ Meteor.startup(function() {
         cb();
       };
 
-      paginator.setPage(testCallback);
+      paginator._setCurrentPage(testCallback);
     });
   }
 });
@@ -430,7 +434,7 @@ Meteor.startup(function() {
           });
         }
       });
-      paginator.setPage(function() {});
+      paginator._setCurrentPage(function() {});
     });
   }
 });

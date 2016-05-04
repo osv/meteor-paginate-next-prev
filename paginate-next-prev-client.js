@@ -7,6 +7,7 @@ var I_PREV = PaginatePrevNext.PAGE_NAMES[0],
 var V_LIMIT = 'limit',
     V_SORTER = 'sorter',
     V_FILTER = 'filter',
+    V_PAGE = 'page',
     V_IS_LOADING = 'isLoading';
 
 _.extend(PaginatePrevNext.prototype, {
@@ -53,6 +54,7 @@ _.extend(PaginatePrevNext.prototype, {
     }
 
     this.rDict.set(V_SORTER, sorterName);
+    this.setPage();
     return this;
   },
 
@@ -67,6 +69,7 @@ _.extend(PaginatePrevNext.prototype, {
     }
 
     this.rDict.set(V_FILTER, queryFilter);
+    this.setPage();
     return this;
   },
 
@@ -74,9 +77,11 @@ _.extend(PaginatePrevNext.prototype, {
     return this.rDict.get(V_FILTER) || {};
   },
 
-  setPage: function(prevNext, sortValue, isNextPage, callback) {
+  _setCurrentPage: function(prevNext, sortValue, isNextPage, callback) {
     var self = this;
 
+    // autorun!!!
+    //
     // allow first arg to be callback
     if (arguments.length === 1 && _.isFunction(prevNext)) {
       callback = prevNext;
@@ -149,10 +154,26 @@ _.extend(PaginatePrevNext.prototype, {
     return this.rPageData.get(I_CURRENT) || {};
   },
 
-  initSubscribtions: function() {
-    var self = this;
+  setPage: function(prevNext, sortValue, isNextPage) {
+    this.rDict.set(V_PAGE, {
+      prevNext: prevNext,
+      sortValue: sortValue,
+      isNextPage: isNextPage,
+    });
+    return this;
+  },
 
-    // precacheOpt may be array of string or boolean
+  _initAutorun: function() {
+    var self = this;
+    Meteor.autorun(function() {
+      var page = self.rDict.get(V_PAGE) || {};
+
+      self._setCurrentPage(page.prevNext, page.sortValue, page.isNextPage);
+    });
+  },
+
+  _initSubscribtions: function() {
+    var self = this;
 
     self.subPages.forEach(subscribe);
 

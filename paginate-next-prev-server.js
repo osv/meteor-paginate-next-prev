@@ -148,12 +148,15 @@ _.extend(PaginatePrevNext.prototype, {
         userId: this.userId,
       };
 
-      if (_.isEmpty(pageItems)) {
-        return [];
-      }
+      pageItems = pageItems || [];
+
       // ensure that pageitems is id - str, num or ObjectID
       check(pageItems, [Match.OneOf(String, Meteor.Collection.ObjectID, Number)]);
       check(sorterName, String);
+
+      if (_.isEmpty(pageItems)) {
+        return [];
+      }
 
       var sorter = self.sorterByName(sorterName);
 

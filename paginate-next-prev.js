@@ -56,8 +56,9 @@ PaginatePrevNext = function(options) {
 
   if (Meteor.isClient) {
     this.initDefault();
+    this._initAutorun();
     if (options.subscribe) {
-      this.initSubscribtions();
+      this._initSubscribtions();
     }
   }
 
