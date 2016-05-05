@@ -193,6 +193,7 @@ _.extend(PaginatePrevNext.prototype, {
       prevNext: prevNext,
       sortValue: sortValue,
       isNextPage: isNextPage,
+      t: new Date()             // force update
     });
     return this;
   },
