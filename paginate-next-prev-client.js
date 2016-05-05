@@ -234,6 +234,23 @@ _.extend(PaginatePrevNext.prototype, {
     }
   },
 
+  events: function() {
+    var self = this;
+    return {
+      'click .js-pg-next-page': function(e, t) {
+        self.nextPage();
+      },
+
+      'click .js-pg-prev-page': function(e, t) {
+        self.previousPage();
+      },
+
+      'click .js-pg-home-page': function(e, t) {
+        self.setPage();
+      },
+    };
+  },
+
   isLoading: function() {
     var loadingCurrent = this.rLoading.get(I_CURRENT),
         subReady = true;
