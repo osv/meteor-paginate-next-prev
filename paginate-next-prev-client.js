@@ -52,6 +52,7 @@ _.extend(PaginatePrevNext.prototype, {
     this.rDict.set(V_LIMIT, limit);
     return this;
   },
+
   getLimit: function() {
     return this.rDict.get(V_LIMIT);
   },
@@ -214,12 +215,12 @@ _.extend(PaginatePrevNext.prototype, {
   },
 
   isLoading: function() {
-    var loadingCurrent = this.rDict.get(V_IS_LOADING),
+    var loadingCurrent = this.rLoading.get(I_CURRENT),
         subReady = true;
     if (this._settings.subscribe) {
-      subReady = !this.subscribes.current.ready();
+      subReady = this.subscribes.current.ready();
     }
-    return (loadingCurrent && subReady);
+    return (loadingCurrent || !subReady);
   },
 
   nextPage: function() {
