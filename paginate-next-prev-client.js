@@ -23,7 +23,6 @@ _.extend(PaginatePrevNext.prototype, {
 
     // data of previous subscribed ids for comparing
     this.oldSubscribes = {};
-
     this._varsInitialized = true;
   },
 
@@ -169,6 +168,26 @@ _.extend(PaginatePrevNext.prototype, {
     return this.rPageData.get(I_CURRENT) || {};
   },
 
+  getItems: function() {
+    var data = this.getPageData().data || [],
+        settings = this._settings;
+
+    if (settings.subscribe) {
+      var sorter = this.sorterByName(this.getSorter()),
+          sortField = sorter.field,
+          sortDirection = sorter.abc ? 1 : -1,
+          queryOptions = {sort: {}},
+          collection = settings.collection,
+          ids = _.pluck(data, '_id');
+
+      queryOptions.sort[sortField] = sortDirection;
+
+      return collection.find({_id: {$in: ids}}, queryOptions);
+    } else {
+      return data;
+    }
+  },
+
   setPage: function(prevNext, sortValue, isNextPage) {
     this.rDict.set(V_PAGE, {
       prevNext: prevNext,
@@ -223,63 +242,38 @@ _.extend(PaginatePrevNext.prototype, {
     return (loadingCurrent || !subReady);
   },
 
-  nextPage: function() {
-    if (this.hasNext()) {
-      var page = this.rPageData.get(I_NEXT) || {},
-          current = page.current;
-      this.rPageData.set(I_CURRENT, page);
-      this.setPage(current.prevNext, current.sortValue, true /*isNextPage*/);
-    }
-    return this;
-  },
+  nextPage: createNavMethod(I_NEXT),
+  previousPage: createNavMethod(I_PREV),
+  hasNext: createHasMethod(I_NEXT),
+  hasPrev: createHasMethod(I_PREV),
 
-  previousPage: function() {
-    if (this.hasPrev()) {
-      var page = this.rPageData.get(I_PREV) || {},
-          current = page.current;
-      this.rPageData.set(I_CURRENT, page);
-      this.setPage(current.prevNext, current.sortValue, true /*isNextPage*/);
-    }
-    return this;
-  },
-
-  hasNext: function() {
-    var pageData = this.rPageData.get(I_NEXT) || {},
-        isEmpty = _.isEmpty(pageData.data),
-        isLoading = this.rLoading.get(I_NEXT);
-    return !(isEmpty || isLoading);
-  },
-  hasPrev: function() {
-    var pageData = this.rPageData.get(I_PREV) || {},
-        isEmpty = _.isEmpty(pageData.data),
-        isLoading = this.rLoading.get(I_PREV);
-    return !(isEmpty || isLoading);
-  },
-
-  // templateHelpers: function(template) {
-  //   var self = this;
-  //   var helpers = {
-  //     isLoading: function() {
-  //       var subReady = true;
-  //       if (self._settings.subscribe) {
-  //         subReady = self.subscribeCurrent.ready();
-  //       }
-  //       return self.rIsLoading.get() && !subReady;
-  //     },
-  //     hasNext: function() {
-  //       var pageData = self.getPageData() || {},
-  //           nextPage = pageData.next;
-
-  //       return !!nextPage;
-  //     },
-  //     hasPrev: function() {
-  //       var pageData = self.getPageData() || {},
-  //           previousPage = pageData.previous;
-
-  //       return !!previousPage;
-  //     },
-  //   };
-
-  //   template.helpers(helpers);
-  // },
+  _has: function(prevOrNext) {
+    return prevOrNext === I_NEXT ? this.hasNext() : this.hasPrev();
+  }
 });
+
+function createNavMethod(prevOrNext) {
+  return function() {
+    if (this._has(prevOrNext)) {
+      var page = this.rPageData.get(prevOrNext) || {},
+          current = page.current;
+      this.rPageData.set(I_CURRENT, page);
+      this.setPage(current.prevNext, current.sortValue, true /*isNextPage*/);
+    }
+    return this;
+  };
+}
+
+function createHasMethod(prevOrNext) {
+  return function(classActive, classDisabled) {
+    // if no classes, just return boolean
+    if (!arguments.length) {
+      classActive = true;
+      classDisabled = false;
+    }
+    var pageData = this.rPageData.get(prevOrNext) || {},
+        isEmpty = _.isEmpty(pageData.data),
+        isLoading = this.rLoading.get(prevOrNext);
+    return !(isEmpty || isLoading) ? classActive : classDisabled;
+  };
+}
