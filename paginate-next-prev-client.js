@@ -10,24 +10,31 @@ var V_LIMIT = 'limit',
     V_PAGE = 'page';
 
 _.extend(PaginatePrevNext.prototype, {
+  _initVars: function() {
+    this.rDict = new ReactiveDict();     // limit, filters, etc
+    this.rLoading = new ReactiveDict();  // is loading page status
+    this.rPageData = new ReactiveDict(); // data for page
+    // timeouts of loading prev/next pages for precaching
+    // also if null - don't save data from meteor called method
+    this._tmPreCache = {};
+
+    // curr, next, prev pages subscribes here
+    this.subscribes = {};
+
+    // data of previous subscribed ids for comparing
+    this.oldSubscribes = {};
+
+    this._varsInitialized = true;
+  },
+
   initDefault: function() {
     var settings = this._settings,
         limit = settings.limit,
         sorterName = settings.sortsBy[0].name;
 
     // Init reactive var
-    if (!this.rDict) {
-      this.rDict = new ReactiveDict();     // limit, filters, etc
-      this.rLoading = new ReactiveDict();  // is loading page status
-      this.rPageData = new ReactiveDict(); // data for page
-      // timeouts of loading prev/next pages for precaching
-      // also if null - don't save data from meteor called method
-      this._tmPreCache = {};
-
-      this.subscribes = {};
-
-      // data of previous subscribed ids for comparing
-      this.oldSubscribes = {};
+    if (!this._varsInitialized) {
+      this._initVars();
     }
     this.setLimit(limit);
     this.setSorter(sorterName);
