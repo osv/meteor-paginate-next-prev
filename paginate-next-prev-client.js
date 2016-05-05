@@ -7,8 +7,7 @@ var I_PREV = PaginatePrevNext.PAGE_NAMES[0],
 var V_LIMIT = 'limit',
     V_SORTER = 'sorter',
     V_FILTER = 'filter',
-    V_PAGE = 'page',
-    V_IS_LOADING = 'isLoading';
+    V_PAGE = 'page';
 
 _.extend(PaginatePrevNext.prototype, {
   initDefault: function() {
@@ -18,13 +17,17 @@ _.extend(PaginatePrevNext.prototype, {
 
     // Init reactive var
     if (!this.rDict) {
-      this.rDict = new ReactiveDict();
-      this.rPageData = new ReactiveDict();
+      this.rDict = new ReactiveDict();     // limit, filters, etc
+      this.rLoading = new ReactiveDict();  // is loading page status
+      this.rPageData = new ReactiveDict(); // data for page
       // timeouts of loading prev/next pages for precaching
       // also if null - don't save data from meteor called method
       this._tmPreCache = {};
 
       this.subscribes = {};
+
+      // data of previous subscribed ids for comparing
+      this.oldSubscribes = {};
     }
     this.setLimit(limit);
     this.setSorter(sorterName);
@@ -99,7 +102,7 @@ _.extend(PaginatePrevNext.prototype, {
 
     callback = callback || function() {};
 
-    self.rDict.set(V_IS_LOADING, true);
+    self.rLoading.set(I_CURRENT, true);
 
     [I_PREV, I_NEXT].forEach(function clearTimeout(i) {
       var timeoutId = self._tmPreCache[i];
@@ -110,19 +113,21 @@ _.extend(PaginatePrevNext.prototype, {
     });
 
     Meteor.call(self._methodNameSet, opt, function(err, res) {
-      self.rDict.set(V_IS_LOADING, false);
+      self.rLoading.set(I_CURRENT, false);
       self.rPageData.set(I_CURRENT, res || {});
-
-      [I_PREV, I_NEXT].forEach(function(prevOrNext) {
-        self.rPageData.set(prevOrNext, {});
-      });
 
       if (!err) {
         if (res.previous) {
+          self.rLoading.set(I_PREV, true);
           self._tmPreCache[I_PREV] = setTimeout(precachePage(res.previous, I_PREV), 400);
+        } else {
+          self.rPageData.set(I_PREV, {});
         }
         if (res.next) {
+          self.rLoading.set(I_NEXT, true);
           self._tmPreCache[I_NEXT] = setTimeout(precachePage(res.next, I_NEXT), 300);
+        } else {
+          self.rPageData.set(I_NEXT, {});
         }
       }
       callback(err, res);
@@ -139,6 +144,8 @@ _.extend(PaginatePrevNext.prototype, {
           limit: self.getLimit(),
         };
         Meteor.call(self._methodNameSet, opt, function(err, res) {
+          self.rLoading.set(prevOrNext, false);
+
           // only apply if not cancelled
           if (self._tmPreCache[prevOrNext]) {
             self.rPageData.set(prevOrNext, res);
@@ -180,11 +187,21 @@ _.extend(PaginatePrevNext.prototype, {
     function subscribe(i) {
       Meteor.autorun(function(c) {
         var page = self.rPageData.get(i) || {},
-            pageItems = _.pluck(page.data, '_id'),
+            itemIds = _.pluck(page.data, '_id'),
             sorterName = page.sorterName;
 
+        var isCurrentNotReady = (i !== I_CURRENT &&  // if subscribe is not "current"
+                                 self.subscribes[I_CURRENT] && // and current sub is not ready
+                                 !self.subscribes[I_CURRENT].ready());
+        if (isCurrentNotReady ||
+            _.isEqual(itemIds, self.oldSubscribes[i])) {
+          return;
+        }
+        self.debug('subscribing "' + i + '"\nids:', itemIds);
+
+        self.oldSubscribes[i] = itemIds;
         self.subscribes[i] =
-          Meteor.subscribe(self._subscribeNamePrefix + i, pageItems, sorterName);
+          Meteor.subscribe(self._subscribeNamePrefix + i, itemIds, sorterName);
       });
     }
   },
@@ -193,7 +210,7 @@ _.extend(PaginatePrevNext.prototype, {
     var loadingCurrent = this.rDict.get(V_IS_LOADING),
         subReady = true;
     if (this._settings.subscribe) {
-        subReady = this.subscribes.current.ready();
+      subReady = !this.subscribes.current.ready();
     }
     return (loadingCurrent && subReady);
   },
@@ -219,12 +236,16 @@ _.extend(PaginatePrevNext.prototype, {
   },
 
   hasNext: function() {
-    var pageData = this.rPageData.get(I_NEXT) || {};
-    return !_.isEmpty(pageData.data);
+    var pageData = this.rPageData.get(I_NEXT) || {},
+        isEmpty = _.isEmpty(pageData.data),
+        isLoading = this.rLoading.get(I_NEXT);
+    return !(isEmpty || isLoading);
   },
   hasPrev: function() {
-    var pageData = this.rPageData.get(I_PREV) || {};
-    return !_.isEmpty(pageData.data);
+    var pageData = this.rPageData.get(I_PREV) || {},
+        isEmpty = _.isEmpty(pageData.data),
+        isLoading = this.rLoading.get(I_PREV);
+    return !(isEmpty || isLoading);
   },
 
   // templateHelpers: function(template) {
