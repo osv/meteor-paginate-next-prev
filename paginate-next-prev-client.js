@@ -90,8 +90,6 @@ _.extend(PaginatePrevNext.prototype, {
   _setCurrentPage: function(prevNext, sortValue, isNextPage, callback) {
     var self = this;
 
-    // autorun!!!
-    //
     // allow first arg to be callback
     if (arguments.length === 1 && _.isFunction(prevNext)) {
       callback = prevNext;
@@ -218,12 +216,14 @@ _.extend(PaginatePrevNext.prototype, {
             itemIds = _.pluck(page.data, '_id'),
             sorterName = page.sorterName;
 
-        var isCurrentNotReady = (i !== I_CURRENT &&  // if subscribe is not "current"
-                                 self.subscribes[I_CURRENT] && // and current sub is not ready
-                                 !self.subscribes[I_CURRENT].ready());
-        if (isCurrentNotReady ||
-            _.isEqual(itemIds, self.oldSubscribes[i])) {
-          return;
+        if (i !== I_CURRENT) {
+          // if subscribe is not "current" and current sub is not ready
+          var isCurrentNotReady = (self.subscribes[I_CURRENT] &&
+                                   !self.subscribes[I_CURRENT].ready());
+          if (isCurrentNotReady ||
+              _.isEqual(itemIds, self.oldSubscribes[i])) {
+            return;
+          }
         }
         self.debug('subscribing "' + i + '"\nids:', itemIds);
 
