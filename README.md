@@ -7,6 +7,8 @@ Meteor pagination with previous and next navigation
 ```js
 
 YourCollection = new JobCollection('someItems');
+YourCollection._ensureIndex({updated: -1});
+YourCollection._ensureIndex({created: -1});
 
 Paginate = new PaginatePrevNext({
   collection: YourCollection,
@@ -54,4 +56,11 @@ if (Meteor.isClient) {
 
 ## DESCRIPTION
 
-You have collection that have unique (most time) field and want then you can create paginating with previous/next page navigation.
+If collection have unique (most time) field then this package able to create paginating with previous/next page navigation.
+Optional subscription or fast fetch items without. Precaching previous/next pages and optional precaching subscription too. Designer for speed and various use cases.
+
+## SPEED AND PERFORMANCE
+
+This package will do 3 method requests for ids of current, next, previous pages (delayed) and other fields of items if subscibe is not enabled.
+With right index on sort field these 3 queries are very cheap.
+Subscription require more resources - need 1..3 subscribtion and collection mat be fullfilled with extra data that may be not need on client.
