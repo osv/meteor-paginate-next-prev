@@ -9,6 +9,8 @@ var V_LIMIT = 'limit',
     V_FILTER = 'filter',
     V_PAGE = 'page';
 
+var REFRESH_DELAY = 1000;
+
 _.extend(PaginatePrevNext.prototype, {
   _initVars: function() {
     this.rDict = new ReactiveDict();     // limit, filters, etc
@@ -191,8 +193,18 @@ _.extend(PaginatePrevNext.prototype, {
       prevNext: prevNext,
       sortValue: sortValue,
       isNextPage: isNextPage,
-      t: new Date()             // force update
+      t: +new Date()             // force update
     });
+    return this;
+  },
+
+  refresh: function() {
+    var page = this.rDict.get(V_PAGE) || {},
+        now = +new Date();
+    if (!(page.t && now - page.t < REFRESH_DELAY)) {
+      page.t = now;
+      this.rDict.set(V_PAGE, page);
+    }
     return this;
   },
 
@@ -200,6 +212,7 @@ _.extend(PaginatePrevNext.prototype, {
     var self = this;
     Meteor.autorun(function() {
       var page = self.rDict.get(V_PAGE) || {};
+      console.log('fetch');
 
       self._setCurrentPage(page.prevNext, page.sortValue, page.isNextPage);
     });
@@ -214,7 +227,7 @@ _.extend(PaginatePrevNext.prototype, {
       Meteor.autorun(function(c) {
         var page = self.rPageData.get(i) || {},
             itemIds = _.pluck(page.data, '_id'),
-            sorterName = page.sorterName;
+            sorterName = self.getSorter();
 
         if (i !== I_CURRENT) {
           // if subscribe is not "current" and current sub is not ready

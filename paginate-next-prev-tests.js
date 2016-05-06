@@ -85,7 +85,7 @@ Meteor.startup(function() {
     var resOfSetter = p.setSorter('sorter2');
     test.equal(resOfSetter, p, 'Setter should return this');
     test.equal(p.getSorter(), 'sorter2', 'Set limit to 3');
-    test.equal(p.rDict.get('page'), {}, 'Setter should reset page data');
+    test.equal(p.rDict.get('page').abc, undefined, 'Setter should reset page data');
     test.throws(function() { p.setSorter('xyz'); }, /Sorter not found/);
   });
 
@@ -98,7 +98,7 @@ Meteor.startup(function() {
     var resOfSetter = p.setFilter(filter);
     test.equal(resOfSetter, p, 'Setter should return this');
     test.equal(p.getFilter(), filter, 'Get previous set filter');
-    test.equal(p.rDict.get('page'), {}, 'Setter should reset page data');
+    test.equal(p.rDict.get('page').abc, undefined, 'Setter should reset page data');
     test.throws(function() { p.setFilter(1); }, /Filter should be object/);
   });
 });
@@ -434,7 +434,7 @@ Meteor.startup(function() {
           });
         }
       });
-      paginator._setCurrentPage(function() {});
+      paginator.setPage();
     });
   }
 });
