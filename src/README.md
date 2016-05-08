@@ -71,7 +71,7 @@ Next, previous ids need to test for availability navigation.
 Also these cached prev,next pages used as when navigating (certainly actual data of current page will be loaded again).
 Subscription require more resources - need 1..3 subscribtion and collection will be fullfilled with extra data that may be not need on client, just remember this. You can presubscribe for 'next' only for example..
 
-## Settings
+## SETTINGS
 
 Settings can be passed to constructor `PaginatePrevNext()` and should be same for client/server.
 
@@ -139,9 +139,9 @@ Client only API:
 - **hasNext()**, **hasPrev()** - *reactive*, return true if can go to next/previous page;
 - **nextPage()**, **previousPage()** - go to next/previous page
 
-## SECURE
+## SECURITY
 
-In setting you can set next callbacks for make pagination more secure:
+In setting you can set next callbacks in constructor to make pagination more secure:
 
 - **onAuth(stash)**  - return false if no allowed. stash.userId - userId. You can extend stash object here. For example you can add to stash role that will be used in other callbacks.
 ```js

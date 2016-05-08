@@ -1,6 +1,6 @@
 Package.describe({
   name: 'osv:paginate-next-prev',
-  version: '0.1.0',
+  version: '0.1.1',
   summary: 'Pagination with previous and next navigation.',
   git: 'https://github.com/osv/meteor-paginate-next-prev.git',
   documentation: 'README.md'
