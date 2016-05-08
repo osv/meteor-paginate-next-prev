@@ -75,7 +75,7 @@ if (Meteor.isClient) {
 
   Template.pagination.events({
     'click .js-toggle-order': function() {
-      var paginator = Template.instance().data.pg,
+      var paginator = Template.instance().data.pager,
           oldSorter = paginator.getSorter(),
           newSorter = oldSorter == 'default' ? 'reverse' : 'default';
       paginator.setSorter(newSorter);}});

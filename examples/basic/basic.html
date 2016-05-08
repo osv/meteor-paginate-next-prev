@@ -18,13 +18,13 @@
       <p class="describe">"paginateSub" - subscribe for items with <code>subscribePrecache: ['next']</code>. Only next page is presubscribed.</p>
       <hr/>
       {{> navigationSub}}
-      {{> pagination pg=paginationSub}}
+      {{> pagination pager=paginationSub}}
     </div>
     <div class="col-sm-6">
       <p class="describe">"paginateNoSub" - use methods for get items, need manual refresh</p>
       <hr/>
       {{> navigationNoSub}}
-      {{> pagination pg=paginationNoSub}}
+      {{> pagination pager=paginationNoSub}}
       <div class="row">
         <button class="col-sm-12 js-refresh btn btn-default">
           Refresh ({{refreshTime}})
@@ -41,10 +41,10 @@
       Toggle sort order
     </button>
   </div>
-  {{#if pg.isLoading}}
+  {{#if pager.isLoading}}
     {{> loadingSpinner}}    
   {{/if}}
-  {{#each pg.getItems}}
+  {{#each pager.getItems}}
     <div class="row">
       <col-sm-12>
         {{ idx }} - {{ data }}
