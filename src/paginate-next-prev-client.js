@@ -266,6 +266,10 @@ _.extend(PaginatePrevNext.prototype, {
       'click .js-pg-home-page': function(e, t) {
         self.setPage();
       },
+
+      'click .js-pg-refresh-page': function(e, t) {
+        self.refresh();
+      },
     };
   },
 
