@@ -134,8 +134,35 @@ Client only API:
 - **hasNext()**, **hasPrev()** - *reactive*, return true if can go to next/previous page;
 - **nextPage()**, **previousPage()** - go to next/previous page
 
+## SECURE
 
-## Template example
+In setting you can set next callbacks for make pagination more secure:
+
+- **onAuth(stash)**  - return false if no allowed. stash.userId - userId. You can extend stash object here. For example you can add to stash role that will be used in other callbacks.
+```js
+onAuth: function checkAdmin(stash, filter) {
+  stash.isAdmin = checkAdmin(stash.userId);
+  return true;
+}
+```
+
+- **onQueryCheck(stash, filter)** - called after *onAuth()*. Sanitize Mongo query. Stash - modified stash from *onAuth()*. Example:
+```js
+onQueryCheck: function allowCustomFilterForAdminOnly(stash, filter) {
+  return stash.isAdmin ? filter : {};
+}
+```
+
+- **fields(stash)** - called after *onQueryCheck()*. Limit Fields. Example:
+```js
+fields: function restrictFields(stash, filter) {
+  var allFields = {};
+  var publicFields = {public: 1, someOtherPublic: 1};
+  return stash.isAdmin ? allFields : publicFields;
+}
+```
+
+## TEMPLATE EXAMPLE
 
 ```html
 <template name="itemsPaginate">
