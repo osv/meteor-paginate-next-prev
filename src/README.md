@@ -79,10 +79,15 @@ Settings can be passed to constructor `PaginatePrevNext()` and should be same fo
 - **limitMin** - Number, default 1;
 - **limit** - Number, default 10. Set default limit. Can be modified via *setLimit(N)* method;
 - **limitMax** - Number, default 10;
-- **fields** - Object or Function that return object. Mongo fields query;
+- **fields** - Object or Function that return object. Limit fields of Mongo query.
+Allowed to specify the inclusion only. e.x. `{foo: 1, bar: 1}`.
+Suppression not allowed (`{foo: 0}`);
 - **onAuth** - Function. Check authorization function. Should return *true* if access allowed;
 - **onQueryCheck** - Filter processing function. You may restrict some queries if need here;
-- **sortsBy** - *required* Array of sorts. Used `[0]` as default sorter. You can use only one field for sorting. So if you need compound sort - use slug field. For example for sort: {index: 1, created: -1,} value of slug field may looks like `00001/2016-08-01-12-00-000`. Values should be unique for work in correct way. Be carefull when you use Date if some of you items may be created in same time.
+- **sortsBy** - *required* Array of sorts. Used `[0]` as default sorter.
+You can use only one field for sorting.
+So if you need compound sort - use slug field. For example for sort: {index: 1, created: -1,} value of slug field may looks like `00001/2016-08-01-12-00-000`.
+Values should be unique for work in correct way. Be carefull when you use Date if some of you items may be created in same time.
 Possible fields:
   - **name** - *required*, name of sorter. *setSorter(name)* can change pagination sort;
   - **field** - *required* Mongo's sort field;
