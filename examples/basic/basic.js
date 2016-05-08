@@ -40,6 +40,7 @@ paginateSub = new PaginatePrevNext({
   collection: ItemCol,
   name: 'sub',
   subscribe: true,
+  subscribePrecache: ['next'],
   sortsBy: [
     {
       name: 'default',

@@ -15,14 +15,16 @@
   
   <div class="row">
     <div class="col-sm-6">
-      <p>"paginateSub" - subscribe for items</p>
-      {{> pagination pg=paginationSub}}
+      <p class="describe">"paginateSub" - subscribe for items with <code>subscribePrecache: ['next']</code>. Only next page is presubscribed.</p>
+      <hr/>
       {{> navigationSub}}
+      {{> pagination pg=paginationSub}}
     </div>
     <div class="col-sm-6">
-      <p>"paginateNoSub" - use methods for get items, need manual refresh</p>
-      {{> pagination pg=paginationNoSub}}
+      <p class="describe">"paginateNoSub" - use methods for get items, need manual refresh</p>
+      <hr/>
       {{> navigationNoSub}}
+      {{> pagination pg=paginationNoSub}}
       <div class="row">
         <button class="col-sm-12 js-refresh btn btn-default">
           Refresh ({{refreshTime}})
@@ -34,7 +36,7 @@
 
 <template name="pagination">
   <div class="row">
-    <button class="btn btn-primary js-toggle-order">
+    <button class="col-sm-6 btn btn-primary js-toggle-order">
       <i class="glyphicon glyphicon-sort"></i>
       Toggle sort order
     </button>
