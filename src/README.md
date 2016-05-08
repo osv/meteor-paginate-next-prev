@@ -67,9 +67,9 @@ There no templates for use, but it easy to create own templates.
 
 This package will do 3 method requests for ids of current, next, previous pages (requests are delayed).
 With right index on sort field these 3 queries are very cheap.
-Next, previous ids need to test for availability navigation.
+Next, previous ids need to test for navigation availability.
 Also these cached prev,next pages used as when navigating (certainly actual data of current page will be loaded again).
-Subscription require more resources - need 1..3 subscribtion and collection will be fullfilled with extra data that may be not need on client, just remember this. You can presubscribe for 'next' only for example..
+Subscription require more resources - need 1..3 subscribtion and collection will be fullfilled with extra data that may be not need on client, just remember this. You can presubscribe for 'next' only for example.
 
 ## SETTINGS
 
@@ -96,7 +96,7 @@ Possible fields:
   - **name** - *required*, name of sorter. *setSorter(name)* can change pagination sort;
   - **field** - *required* Mongo's sort field;
   - **abc** - Boolean. Sort direction ABC. Default - false. 
-  - **init** - Function. Return default value of sort field when go home page. Default return undefined.
+  - **init** - Function. Return default (home) value of sort. Default is undefined.
 Example:
 
 ```js
@@ -131,7 +131,7 @@ Client only API:
   - **sortValue** - value for sort field;
   - **isNextPage** - if false - use `$lte`/`$gte` for value of sort field when quering page.
 - **refresh()** - refresh current page, throttled to 1s.
-- **events()** - return navigation event for template. It setup next events: `click .js-pg-refresh-page`, `click .js-pg-home-page`, `click .js-pg-prev-page`, `click .js-pg-next-page`. Example:
+- **events()** - return navigation events for template: `click .js-pg-refresh-page`, `click .js-pg-home-page`, `click .js-pg-prev-page`, `click .js-pg-next-page`. Example:
 ```js
   Template.navigation.events(paginate.events());
   ```
@@ -170,6 +170,8 @@ fields: function restrictFields(stash, filter) {
 If you secure your app by using DDPRateLimiter check method **allMethods()**. It return {type, name} methods and subscriptions.
 
 ## TEMPLATE EXAMPLE
+
+See examples on github for more examples.
 
 ```html
 <template name="itemsPaginate">
