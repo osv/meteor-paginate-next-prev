@@ -86,6 +86,9 @@ Meteor.startup(function() {
     test.equal(resOfSetter, p, 'Setter should return this');
     test.equal(p.getSorter(), 'sorter2', 'Set limit to 3');
     test.equal(p.rDict.get('page').abc, undefined, 'Setter should reset page data');
+
+    p.setSorter();              // reset to default
+    test.equal(p.getSorter(), 'sorter1', 'setSorter() should reset to default');
     test.throws(function() { p.setSorter('xyz'); }, /Sorter not found/);
   });
 

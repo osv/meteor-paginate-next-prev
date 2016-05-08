@@ -30,15 +30,14 @@ _.extend(PaginatePrevNext.prototype, {
 
   initDefault: function() {
     var settings = this._settings,
-        limit = settings.limit,
-        sorterName = settings.sortsBy[0].name;
+        limit = settings.limit;
 
     // Init reactive var
     if (!this._varsInitialized) {
       this._initVars();
     }
     this.setLimit(limit);
-    this.setSorter(sorterName);
+    this.setSorter();
     return this;
   },
 
@@ -59,13 +58,19 @@ _.extend(PaginatePrevNext.prototype, {
   },
 
   setSorter: function(sorterName) {
-    var sorter = this.sorterByName(sorterName);
 
+    var sorter;
+    if (!sorterName) {
+      sorter = this._settings.sortsBy[0];
+    } else {
+      sorter = this.sorterByName(sorterName);
+    }
+    
     if (! sorter) {
       this.error('set-sorter', 'Sorter not found');
     }
 
-    this.rDict.set(V_SORTER, sorterName);
+    this.rDict.set(V_SORTER, sorter.name);
     this.setPage();
     return this;
   },
@@ -214,8 +219,6 @@ _.extend(PaginatePrevNext.prototype, {
     var self = this;
     Meteor.autorun(function() {
       var page = self.rDict.get(V_PAGE) || {};
-      console.log('fetch');
-
       self._setCurrentPage(page.prevNext, page.sortValue, page.isNextPage);
     });
   },
