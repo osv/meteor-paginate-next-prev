@@ -87,7 +87,7 @@ _.extend(PaginatePrevNext.prototype, {
         }
       }
       // Ensure that sorter field is exposed
-      if (fields) {
+      if (!_.isEmpty(fields)) {
         queryOpt.fields = fields;
         queryOpt.fields[sorter.field] = 1;
       }
