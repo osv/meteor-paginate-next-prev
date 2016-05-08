@@ -33,6 +33,12 @@
 </template>
 
 <template name="pagination">
+  <div class="row">
+    <button class="btn btn-primary js-toggle-order">
+      <i class="glyphicon glyphicon-sort"></i>
+      Toggle sort order
+    </button>
+  </div>
   {{#if pg.isLoading}}
     {{> loadingSpinner}}    
   {{/if}}

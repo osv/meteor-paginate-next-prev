@@ -72,6 +72,15 @@ if (Meteor.isClient) {
   Template.main.events({
     'click .js-refresh': function() { paginateNoSub.refresh(); }});
 
+  Template.pagination.events({
+    'click .js-toggle-order': function() {
+      var paginator = Template.instance().data.pg,
+          oldSorter = paginator.getSorter(),
+          newSorter = oldSorter == 'default' ? 'reverse' : 'default';
+      paginator.setSorter(newSorter);
+    }
+  });
+
   Template.navigationSub.helpers({
     pager() { return paginateSub; }});
   Template.navigationSub.events(paginateSub.events());
