@@ -15,9 +15,12 @@ Paginate = new PaginatePrevNext({
   name: 'pgSomeItems',
   onAuth(stash) {
     var isAdmin = Acl.isAdminById(stash.userId);
-    // you can stash smtg for other callback like onQueryCheck, fields
+    // you can stash smtg for other callback like onQueryCheck(), fields()
     stash.role = Role(stash.userId);
     return isAdmin;
+  },
+  fields: function(stash) {
+    return stash.role = 'admin' ? {} : {public: 1, someOtherPublic: 1};
   },
   limitMin: 10, limit: 20, limitMax: 50,
   subscribe: true,
@@ -69,20 +72,20 @@ Subscription require more resources - need 1..3 subscribtion and collection mat 
 
 Settings can be passed to constructor `PaginatePrevNext()` and should be same for client/server.
 
-- **name** - **required**;
-- **collection** - **required**, Meteor.Collection instance;
+- **name** - *required*;
+- **collection** - *required*, Meteor.Collection instance;
 - **subscribe** - boolean, subscribe for items or not;
-- **subscribePrecache** -boolean or array that may contains 'next', 'prev', affect only if `subscribe: true`;
+- **subscribePrecache** - boolean or array that may contains 'next', 'prev', affect only if `subscribe: true`;
 - **limitMin** - Number, default 1;
 - **limit** - Number, default 10. Set default limit. Can be modified via *setLimit(N)* method;
 - **limitMax** - Number, default 10;
-- **fields** - Object or Function that return object for Mongo fields query;
+- **fields** - Object or Function that return object. Mongo fields query;
 - **onAuth** - Function. Check authorization function. Should return *true* if access allowed;
 - **onQueryCheck** - Filter processing function. You may restrict some queries if need here;
-- **sortsBy** - **required** Array of sorts. Used `[0]` as default sorter. You can use only one field for sorting. So if you need compound sort - use slug field. For example for sort: {index: 1, created: -1,} value of slug field may looks like `00001/2016-08-01-12-00-000`. Values should be unique for work in correct way. Be carefull when you use Date if some of you items may be created in same time.
+- **sortsBy** - *required* Array of sorts. Used `[0]` as default sorter. You can use only one field for sorting. So if you need compound sort - use slug field. For example for sort: {index: 1, created: -1,} value of slug field may looks like `00001/2016-08-01-12-00-000`. Values should be unique for work in correct way. Be carefull when you use Date if some of you items may be created in same time.
 Possible fields:
-  - **name** - **required**, name of sorter. *setSorter(name)* can change pagination sort;
-  - **field** - **required** Mongo's sort field;
+  - **name** - *required*, name of sorter. *setSorter(name)* can change pagination sort;
+  - **field** - *required* Mongo's sort field;
   - **abc** - Boolean. Sort direction ABC. Default - false. 
   - **init** - Function. Return default value of sort field when go home page. Default return undefined.
 Example:
@@ -118,7 +121,7 @@ Client only API:
   - **sortValue** - value for sort field;
   - **isNextPage** - if false - use `$lte`/`$gte` for value of sort field when quering page.
 - **refresh()** - refresh current page, throttled to 1s.
-- **events()** - return event for template for navigation. It setup next events: `click .js-pg-refresh-page`, `click .js-pg-home-page`, `click .js-pg-prev-page`, `click .js-pg-next-page`. Example:
+- **events()** - return navigation event for template. It setup next events: `click .js-pg-refresh-page`, `click .js-pg-home-page`, `click .js-pg-prev-page`, `click .js-pg-next-page`. Example:
 ```js
   Template.navigation.events(paginate.events());
   ```
