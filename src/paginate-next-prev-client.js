@@ -7,6 +7,7 @@ var I_PREV = PaginatePrevNext.PAGE_NAMES[0],
 var V_LIMIT = 'limit',
     V_SORTER = 'sorter',
     V_FILTER = 'filter',
+    V_WAIT_FOR_SUB_READY = 'readyWait',
     V_PAGE = 'page';
 
 var REFRESH_DELAY = 1000;
@@ -274,8 +275,25 @@ _.extend(PaginatePrevNext.prototype, {
   },
 
   isLoading: function() {
-    var loadingCurrent = this.rLoading.get(I_CURRENT);
-    return loadingCurrent;
+    var self = this,
+        loadingCurrent = this.rLoading.get(I_CURRENT),
+        subReady = true;
+
+    if (this._settings.subscribe &&
+        this.rLoading.get(V_WAIT_FOR_SUB_READY) &&
+        this._settings.subscribe) {
+      subReady = this.subscribes.current.ready();
+
+      if (subReady) {
+        Meteor.defer(function() {
+          if (self.subscribes.current.ready()) {
+            self.rLoading.set(V_WAIT_FOR_SUB_READY, false);
+          }
+        });
+      }
+    }
+
+    return (loadingCurrent || !subReady);
   },
 
   nextPage: createNavMethod(I_NEXT),
@@ -292,7 +310,20 @@ function createNavMethod(prevOrNext) {
   return function() {
     if (this._has(prevOrNext)) {
       var page = this.rPageData.get(prevOrNext) || {},
+          data = page.data || [],
+          settings = this._settings,
           current = page.current;
+
+      // Test if we have all items that was set in collection,
+      // if not - isLoading should also check for sub ready.
+      if (settings.subscribe) {
+        var ids = _.pluck(data, '_id');
+        var count = settings.collection.find({_id: {$in: ids}}).count();
+        if (count !== ids.length) {
+          this.rLoading.set(V_WAIT_FOR_SUB_READY, true);
+          this.rLoading.set(I_CURRENT, true);
+        }
+      }
       this.rPageData.set(I_CURRENT, page);
       this.setPage(current.prevNext, current.sortValue, true /*isNextPage*/);
     }
