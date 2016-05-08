@@ -60,13 +60,16 @@ if (Meteor.isClient) {
 ## DESCRIPTION
 
 If collection have unique (most time) field then this package able to create paginating with previous/next page navigation.
-Neighbor prefetching previous/next pages and optional precaching subscriptions of next/previous. There no templates for use, but it easy to create own template.
+Supported neighbor prefetching previous/next pages and optional precaching subscriptions of next/previous pages.
+There no templates for use, but it easy to create own templates.
 
 ## SPEED AND PERFORMANCE
 
 This package will do 3 method requests for ids of current, next, previous pages (requests are delayed).
 With right index on sort field these 3 queries are very cheap.
-Subscription require more resources - need 1..3 subscribtion and collection mat be fullfilled with extra data that may be not need on client.
+Next, previous ids need to test for availability navigation.
+Also these cached prev,next pages used as when navigating (certainly actual data of current page will be loaded again).
+Subscription require more resources - need 1..3 subscribtion and collection will be fullfilled with extra data that may be not need on client, just remember this. You can presubscribe for 'next' only for example..
 
 ## Settings
 
@@ -74,7 +77,7 @@ Settings can be passed to constructor `PaginatePrevNext()` and should be same fo
 
 - **name** - *required*;
 - **collection** - *required*, Meteor.Collection instance;
-- **subscribe** - boolean, subscribe for items or not;
+- **subscribe** - boolean, Meteor.subscribe for items or not;
 - **subscribePrecache** - boolean or array that may contains 'next', 'prev', affect only if `subscribe: true`;
 - **limitMin** - Number, default 1;
 - **limit** - Number, default 10. Set default limit. Can be modified via *setLimit(N)* method;
@@ -140,7 +143,7 @@ In setting you can set next callbacks for make pagination more secure:
 
 - **onAuth(stash)**  - return false if no allowed. stash.userId - userId. You can extend stash object here. For example you can add to stash role that will be used in other callbacks.
 ```js
-onAuth: function checkAdmin(stash, filter) {
+onAuth: function(stash, filter) {
   stash.isAdmin = checkAdmin(stash.userId);
   return true;
 }

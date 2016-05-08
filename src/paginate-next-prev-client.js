@@ -66,7 +66,7 @@ _.extend(PaginatePrevNext.prototype, {
     } else {
       sorter = this.sorterByName(sorterName);
     }
-    
+
     if (! sorter) {
       this.error('set-sorter', 'Sorter not found');
     }
