@@ -77,9 +77,7 @@ if (Meteor.isClient) {
       var paginator = Template.instance().data.pg,
           oldSorter = paginator.getSorter(),
           newSorter = oldSorter == 'default' ? 'reverse' : 'default';
-      paginator.setSorter(newSorter);
-    }
-  });
+      paginator.setSorter(newSorter);}});
 
   Template.navigationSub.helpers({
     pager() { return paginateSub; }});
