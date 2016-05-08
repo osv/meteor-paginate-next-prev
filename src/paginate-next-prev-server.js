@@ -8,7 +8,7 @@ _.extend(PaginatePrevNext.prototype, {
     }
 
     var methods = {};
-    methods[self._methodNameSet] = function(opt) {
+    methods[self._methodName] = function(opt) {
 
       check(opt, {
         prevNext: Boolean,

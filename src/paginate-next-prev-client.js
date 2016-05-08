@@ -123,7 +123,7 @@ _.extend(PaginatePrevNext.prototype, {
       }
     });
 
-    Meteor.call(self._methodNameSet, opt, function(err, res) {
+    Meteor.call(self._methodName, opt, function(err, res) {
       self.rLoading.set(I_CURRENT, false);
       self.rPageData.set(I_CURRENT, res || {});
 
@@ -154,7 +154,7 @@ _.extend(PaginatePrevNext.prototype, {
           filter: self.getFilter(),
           limit: self.getLimit(),
         };
-        Meteor.call(self._methodNameSet, opt, function(err, res) {
+        Meteor.call(self._methodName, opt, function(err, res) {
           self.rLoading.set(prevOrNext, false);
 
           // only apply if not cancelled

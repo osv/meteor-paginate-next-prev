@@ -51,7 +51,7 @@ PaginatePrevNext = function(options) {
 
   var name = this._settings.name;
 
-  this._methodNameSet = 'pg-set-' + name;
+  this._methodName = 'pg-get-' + name;
   this._subscribeNamePrefix = 'pg-sub-' + name + '_';
 
   if (Meteor.isClient) {
