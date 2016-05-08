@@ -87,6 +87,7 @@ Allowed to specify the inclusion only. e.x. `{foo: 1, bar: 1}`.
 Suppression not allowed (`{foo: 0}`);
 - **onAuth** - Function. Check authorization function. Should return *true* if access allowed;
 - **onQueryCheck** - Filter processing function. You may restrict some queries if need here;
+- **prefetchDelay** - Number, default 300. Delay for prefetching next/previous page. previous page delay = prefetchDelay + 100;
 - **sortsBy** - *required* Array of sorts. Used `[0]` as default sorter.
 You can use only one field for sorting.
 So if you need compound sort - use slug field. For example for sort: {index: 1, created: -1,} value of slug field may looks like `00001/2016-08-01-12-00-000`.

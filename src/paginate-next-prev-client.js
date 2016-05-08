@@ -96,7 +96,8 @@ _.extend(PaginatePrevNext.prototype, {
   },
 
   _setCurrentPage: function(prevNext, sortValue, isNextPage, callback) {
-    var self = this;
+    var self = this,
+        settings = self._settings;
 
     // allow first arg to be callback
     if (arguments.length === 1 && _.isFunction(prevNext)) {
@@ -130,13 +131,13 @@ _.extend(PaginatePrevNext.prototype, {
       if (!err) {
         if (res.previous) {
           self.rLoading.set(I_PREV, true);
-          self._tmPreCache[I_PREV] = setTimeout(precachePage(res.previous, I_PREV), 400);
+          self._tmPreCache[I_PREV] = setTimeout(precachePage(res.previous, I_PREV), settings.prefetchDelay + 100);
         } else {
           self.rPageData.set(I_PREV, {});
         }
         if (res.next) {
           self.rLoading.set(I_NEXT, true);
-          self._tmPreCache[I_NEXT] = setTimeout(precachePage(res.next, I_NEXT), 300);
+          self._tmPreCache[I_NEXT] = setTimeout(precachePage(res.next, I_NEXT), settings.prefetchDelay);
         } else {
           self.rPageData.set(I_NEXT, {});
         }
