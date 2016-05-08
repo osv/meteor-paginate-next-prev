@@ -1,0 +1,58 @@
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pagination example</title>
+</head>
+<body>
+  <div class="container">
+    {{> main}}
+  </div>
+</body>
+
+<template name="main">
+  <h2>Paginate 53 items</h2>
+
+  <div class="row">
+    <div class="col-sm-12">
+      <p class="describe">"paginateNoSub" - use methods for get items. You can open dev-console and try some methods. Try <code>paginateNoSub.setPage(false, 12)</code> or <code>paginateNoSub.setLimit(5)</code>, click refresh button for refreshing, 10 items are updated each 1 seconds but we not subscribe here. Check "basic" example for subscribe example.</p>
+      <hr/>
+      {{> pagination pager=pg}}
+      {{> navigation pager=pg}}
+    </div>
+  </div>
+</template>
+
+<template name="pagination">
+  {{#if pager.isLoading}}
+    {{> loadingSpinner}}
+  {{/if}}
+  {{#each pager.getItems}}
+    <div class="row">
+      <col-sm-12>
+        {{ idx }} - {{ data }}
+      </col-sm-12>
+    </div>
+  {{/each}}
+</template>
+
+<template name="navigation">
+  <nav>
+    <ul class="pager">
+      <li class="js-pg-prev-page {{pager.hasPrev '' 'disabled'}}"><a href="#">Previous</a></li>
+      <li class="js-pg-home-page"><a href="#">Home</a></li>
+      <li class="js-pg-next-page {{pager.hasNext '' 'disabled'}}"><a href="#">Next</a></li>
+    </ul>
+  </nav>
+  <div class="row">
+    <button class="col-sm-12 js-pg-refresh-page btn btn-default">
+      Refresh
+    </button>
+  </div>
+</template>
+
+<template name="loadingSpinner">
+  <div class="loader-wrap">
+    <div class="loading-wrap-image"><img src="loader.gif"/></div>
+  </div>
+</template>
