@@ -19,6 +19,7 @@ var CHECK_OPTIONS = {
   fields:        Match.Optional(Match.OneOf(Object, Function)),
   onAuth:        Match.Optional(Function),
   onQueryCheck:  Match.Optional(Function),
+  prefetchDelay: Match.Optional(Number),
   sortsBy: [{
     name:   String,
     init:   Match.Optional(Function),
@@ -38,6 +39,7 @@ PaginatePrevNext = function(options) {
     limitMin: 1,
     limitMax: 10,
     limit: 10,
+    prefetchDelay: 300,
     subscribePrecache: true,
   }, options);
 
@@ -91,5 +93,26 @@ _.extend(PaginatePrevNext.prototype, {
           args = [].slice.call(arguments, 0);
       console.log.apply(console, prefix.concat(args));
     }
+  },
+
+  allMethods: function() {
+    var self = this;
+    var resources = [
+      {
+        type: 'method',
+        name: self._methodName
+      }
+    ];
+
+    if (self._settings.subscribe) {
+      self.subPages.forEach(function(it) {
+        resources.push({
+          type: 'subscription',
+          name: self._subscribeNamePrefix + it
+        });
+      });
+    }
+
+    return resources;
   }
 });

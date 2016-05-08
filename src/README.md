@@ -114,6 +114,7 @@ Example:
 ## API
 
 - **sorterByName(name)**;
+- **allMethods()** - return methods and subscribtions list. Usefull for DDPRateLimiter.
 
 Client only API:
 
@@ -164,6 +165,8 @@ fields: function restrictFields(stash, filter) {
   return stash.isAdmin ? allFields : publicFields;
 }
 ```
+
+If you secure your app by using DDPRateLimiter check method **allMethods()**. It return {type, name} methods and subscriptions.
 
 ## TEMPLATE EXAMPLE
 

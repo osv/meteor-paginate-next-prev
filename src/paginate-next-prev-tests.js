@@ -196,7 +196,6 @@ Meteor.startup(function() {
       paginator._setCurrentPage(testCallback);
     });
 
-    ////
     Tinytest.addAsync('Query page CBA - next page', function (test, cb) {
       paginator.setSorter('by sort item');
       var testCallback = function(err, res) {
@@ -438,6 +437,10 @@ Meteor.startup(function() {
         }
       });
       paginator.setPage();
+      test.equal(paginator.allMethods(), [
+        {type: 'method', name: 'pg-get-test-sub'},
+        {type: 'subscription', name: 'pg-sub-test-sub_current'}
+      ], 'allMethods() should return 1 method and 1 subscribtion');
     });
   }
 });
