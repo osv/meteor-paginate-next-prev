@@ -109,8 +109,6 @@ _.extend(PaginatePrevNext.prototype, {
 
     callback = callback || function() {};
 
-    self.rLoading.set(I_CURRENT, true);
-
     [I_PREV, I_NEXT].forEach(function clearTimeout(i) {
       var timeoutId = self._tmPreCache[i];
       if (timeoutId) {
@@ -195,6 +193,10 @@ _.extend(PaginatePrevNext.prototype, {
       isNextPage: isNextPage,
       t: +new Date()             // force update
     });
+
+    if (!isNextPage) {
+      this.rLoading.set(I_CURRENT, true);
+    }
     return this;
   },
 
@@ -265,12 +267,8 @@ _.extend(PaginatePrevNext.prototype, {
   },
 
   isLoading: function() {
-    var loadingCurrent = this.rLoading.get(I_CURRENT),
-        subReady = true;
-    if (this._settings.subscribe) {
-      subReady = this.subscribes.current.ready();
-    }
-    return (loadingCurrent || !subReady);
+    var loadingCurrent = this.rLoading.get(I_CURRENT);
+    return loadingCurrent;
   },
 
   nextPage: createNavMethod(I_NEXT),
@@ -308,3 +306,4 @@ function createHasMethod(prevOrNext) {
     return !(isEmpty || isLoading) ? classActive : classDisabled;
   };
 }
+
