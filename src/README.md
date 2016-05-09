@@ -59,17 +59,20 @@ if (Meteor.isClient) {
 
 ## DESCRIPTION
 
-If collection have unique (most time) field then this package able to create paginating with previous/next page navigation.
+This package simplifies to you building next/previous paginate of Mongo collections. 
+Collection should have unique (in most time) field.
 Supported neighbor prefetching previous/next pages and optional precaching subscriptions of next/previous pages.
-There no templates for use, but it easy to create own templates.
+There no templates to use for you, but it easy to create own templates by exposing instance to template and ready for use events.
+Check demo in [../examples](examples) folder.
 
 ## SPEED AND PERFORMANCE
 
-This package will do 3 method requests for ids of current, next, previous pages (requests are delayed).
+Next/previous pagination pattern is cheap because it avoid `skip` query parameter and no need to calculate count of items of query.
+This package will do 3 method requests for IDs of current, next, previous pages (requests are delayed via settings `prefetchDelay`, methods is blocked so you can set to 0 this).
 With right index on sort field these 3 queries are very cheap.
-Next, previous ids need to test for navigation availability.
-Also these cached prev,next pages used as when navigating (certainly actual data of current page will be loaded again).
-Subscription require more resources - need 1..3 subscribtion and collection will be fullfilled with extra data that may be not need on client, just remember this. You can presubscribe for 'next' only for example.
+Next, previous IDs need to test for prev/next navigation availability and used as cached version of next/previous navigating (certainly actual data of current page will be loaded again).
+If you need subscription then it require more resources -
+need 1..3 subscribtion and collection will be fullfilled with extra data that may be not need on client. But you can presubscribe for 'next' only, for example.
 
 ## SETTINGS
 
@@ -77,17 +80,6 @@ Settings can be passed to constructor `PaginatePrevNext()` and should be same fo
 
 - **name** - *required*;
 - **collection** - *required*, Meteor.Collection instance;
-- **subscribe** - boolean, Meteor.subscribe for items or not;
-- **subscribePrecache** - boolean or array that may contains 'next', 'prev', affect only if `subscribe: true`;
-- **limitMin** - Number, default 1;
-- **limit** - Number, default 10. Set default limit. Can be modified via *setLimit(N)* method;
-- **limitMax** - Number, default 10;
-- **fields** - Object or Function that return object. Limit fields of Mongo query.
-Allowed to specify the inclusion only. e.x. `{foo: 1, bar: 1}`.
-Suppression not allowed (`{foo: 0}`);
-- **onAuth** - Function. Check authorization function. Should return *true* if access allowed;
-- **onQueryCheck** - Filter processing function. You may restrict some queries if need here;
-- **prefetchDelay** - Number, default 300. Delay for prefetching next/previous page. previous page delay = prefetchDelay + 100;
 - **sortsBy** - *required* Array of sorts. Used `[0]` as default sorter.
 You can use only one field for sorting.
 So if you need compound sort - use slug field. For example for sort: {index: 1, created: -1,} value of slug field may looks like `00001/2016-08-01-12-00-000`.
@@ -111,6 +103,17 @@ Example:
     }
   ]
   ```
+- **subscribe** - boolean, Meteor.subscribe for items or not;
+- **subscribePrecache** - boolean or array that may contains 'next', 'prev', affect only if `subscribe: true`;
+- **onAuth** - Function. Check authorization function. Should return *true* if access allowed;
+- **onQueryCheck** - Filter processing function. You may restrict some queries if need here;
+- **fields** - Object or Function that return object. Limit fields of Mongo query.
+Allowed to specify the inclusion only. e.x. `{foo: 1, bar: 1}`.
+Suppression not allowed (`{foo: 0}`);
+- **prefetchDelay** - Number, default 300. Delay for prefetching next/previous page. previous page delay = prefetchDelay + 100;
+- **limitMin** - Number, default 1;
+- **limit** - Number, default 10. Set default limit. Can be modified via *setLimit(N)* method;
+- **limitMax** - Number, default 10;
 
 ## API
 
@@ -141,9 +144,10 @@ Client only API:
 
 ## SECURITY
 
-In setting you can set next callbacks in constructor to make pagination more secure:
+You can set next callbacks in constructor to make pagination more secure:
 
-- **onAuth(stash)**  - return false if no allowed. stash.userId - userId. You can extend stash object here. For example you can add to stash role that will be used in other callbacks.
+- **onAuth(stash)**  - return false if no allowed. stash.userId - userId. You can extend stash object here. For example, you can add to stash role that will be used in other callbacks - *onQueryCheck*, *fields*.
+
 ```js
 onAuth: function(stash, filter) {
   stash.isAdmin = checkAdmin(stash.userId);
@@ -152,6 +156,7 @@ onAuth: function(stash, filter) {
 ```
 
 - **onQueryCheck(stash, filter)** - called after *onAuth()*. Sanitize Mongo query. Stash - modified stash from *onAuth()*. Example:
+
 ```js
 onQueryCheck: function allowCustomFilterForAdminOnly(stash, filter) {
   return stash.isAdmin ? filter : {};
@@ -159,6 +164,7 @@ onQueryCheck: function allowCustomFilterForAdminOnly(stash, filter) {
 ```
 
 - **fields(stash)** - called after *onQueryCheck()*. Limit Fields. Example:
+
 ```js
 fields: function restrictFields(stash, filter) {
   var allFields = {};
