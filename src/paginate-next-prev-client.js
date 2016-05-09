@@ -315,7 +315,7 @@ function createNavMethod(prevOrNext) {
           settings = this._settings,
           current = page.current;
 
-      // Test if we have all items that was set in collection,
+      // Test if we have all items in collection that was set,
       // if not - isLoading should also check for sub ready.
       if (settings.subscribe) {
         var ids = _.pluck(data, '_id');
